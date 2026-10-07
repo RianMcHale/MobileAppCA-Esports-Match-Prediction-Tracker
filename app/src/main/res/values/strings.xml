@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">EsportsPredictionTracker</string>
+    <string name="view_matches">View sample matches</string>
+    <string name="sample_matches_title">Sample CS2 matches</string>
+    <string name="no_matches">No matches available</string>
+    <string name="match_teams">%1$s vs %2$s</string>
+    <string name="match_game_competition">%1$s | %2$s</string>
+    <string name="match_scheduled">Scheduled: %1$s</string>
 </resources>
