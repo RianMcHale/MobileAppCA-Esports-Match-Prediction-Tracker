@@ -6,4 +6,12 @@
     <string name="match_teams">%1$s vs %2$s</string>
     <string name="match_game_competition">%1$s | %2$s</string>
     <string name="match_scheduled">Scheduled: %1$s</string>
+    <string name="home_eyebrow">COUNTER-STRIKE 2</string>
+    <string name="home_title">CS2 Match Tracker</string>
+    <string name="home_intro">Explore CS2 matchups, competitions and scheduled start times.</string>
+    <string name="home_card_label">MATCHES</string>
+    <string name="home_card_title">Sample fixtures</string>
+    <string name="home_card_description">Browse the featured teams and see when each match is scheduled.</string>
+    <string name="match_list_subtitle">Matchups, competitions and start times</string>
+    <string name="navigate_home">Back to home</string>
 </resources>
