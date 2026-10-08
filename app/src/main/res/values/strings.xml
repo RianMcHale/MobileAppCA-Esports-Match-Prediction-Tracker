@@ -12,6 +12,15 @@
     <string name="home_card_label">MATCHES</string>
     <string name="home_card_title">Sample fixtures</string>
     <string name="home_card_description">Browse the featured teams and see when each match is scheduled.</string>
-    <string name="match_list_subtitle">Matchups, competitions and start times</string>
+    <string name="match_list_subtitle">Tap a match to predict the winner</string>
     <string name="navigate_home">Back to home</string>
+    <string name="open_prediction_for_match">Predict %1$s versus %2$s</string>
+    <string name="prediction_title">Make a prediction</string>
+    <string name="back_to_matches">Back to matches</string>
+    <string name="match_not_found">Match not found</string>
+    <string name="pick_winner">Who will win?</string>
+    <string name="pick_one_team">Choose one team before saving.</string>
+    <string name="select_team_error">Please select a team.</string>
+    <string name="save_prediction">Save prediction</string>
+    <string name="prediction_saved_for">Prediction saved: %1$s</string>
 </resources>
