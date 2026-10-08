@@ -12,6 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.EsportsPredictionTracker">
         <activity
+            android:name=".predictions.PredictionActivity"
+            android:exported="false"
+            android:parentActivityName=".matches.MatchListActivity" />
+        <activity
             android:name=".matches.MatchListActivity"
             android:exported="false"
             android:parentActivityName=".main.MainActivity" />
