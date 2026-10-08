@@ -1,14 +1,14 @@
 package org.setu.esportstracker.matches
 
-data class EsportsMatch(
-    val id: Long,
-    val teamOneId: Long,
-    val teamOneName: String,
-    val teamTwoId: Long,
-    val teamTwoName: String,
-    val game: String,
-    val competition: String,
-    val startTimeUtcMillis: Long,
+data class EsportsMatch( // unique/stable Ids, display names, etc.
+    val id: Long, // unique
+    val teamOneId: Long, // stable
+    val teamOneName: String, // display
+    val teamTwoId: Long, // stable
+    val teamTwoName: String, // display
+    val game: String, // game
+    val competition: String, // tournament
+    val startTimeUtcMillis: Long, // schedule time in milliseconds
 
     // null means winner is not known yet
     val winnerTeamId: Long? = null

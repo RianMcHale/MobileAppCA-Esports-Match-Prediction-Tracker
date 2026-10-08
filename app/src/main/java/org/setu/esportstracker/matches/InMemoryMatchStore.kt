@@ -1,8 +1,8 @@
 package org.setu.esportstracker.matches
 
-class InMemoryMatchStore : MatchStore {
+class InMemoryMatchStore : MatchStore { // provides fixed samples stored in apps memory (to be replaced by API later in the project)
 
-    // Fixed examples from HLTV.org @ 4.54pm
+    // Fixed examples from HLTV.org @ 4.54pm on the 7th of october
     private val matches = listOf(
         // Sample 1: SAW vs Famalicão
         EsportsMatch(

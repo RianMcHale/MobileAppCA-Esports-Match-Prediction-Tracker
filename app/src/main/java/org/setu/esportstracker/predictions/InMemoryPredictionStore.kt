@@ -2,8 +2,10 @@ package org.setu.esportstracker.predictions
 
 object InMemoryPredictionStore : PredictionStore {
 
+    // easch match id points at most one prediction
     private val predictions = mutableMapOf<Long, Prediction>()
 
+    // return saved predictions
     override fun findAll(): List<Prediction> =
         predictions.values.toList()
 
