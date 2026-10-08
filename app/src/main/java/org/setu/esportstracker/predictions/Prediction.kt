@@ -1,4 +1,7 @@
 package org.setu.esportstracker.predictions
 
-class Prediction {
-}
+data class Prediction(
+    val matchId: Long,
+    val predictedTeamId: Long,
+    val createdAtUtcMillis: Long
+)

@@ -1,4 +1,7 @@
 package org.setu.esportstracker.predictions
 
-class PredictionStore {
+interface PredictionStore {
+    fun findAll(): List<Prediction>
+    fun findOne(matchId: Long): Prediction?
+    fun save(prediction: Prediction): Boolean
 }
