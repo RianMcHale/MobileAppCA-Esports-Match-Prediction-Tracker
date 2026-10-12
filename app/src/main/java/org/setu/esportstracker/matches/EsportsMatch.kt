@@ -1,4 +1,5 @@
 package org.setu.esportstracker.matches
+import java.io.Serializable
 
 data class EsportsMatch( // unique/stable Ids, display names, etc.
     val id: Long, // unique
@@ -9,7 +10,5 @@ data class EsportsMatch( // unique/stable Ids, display names, etc.
     val game: String, // game
     val competition: String, // tournament
     val startTimeUtcMillis: Long, // schedule time in milliseconds
-
-    // null means winner is not known yet
-    val winnerTeamId: Long? = null
-)
+    val winnerTeamId: Long? = null // null means winner is not known yet
+) : Serializable // lets the match be passed to the prediction screen

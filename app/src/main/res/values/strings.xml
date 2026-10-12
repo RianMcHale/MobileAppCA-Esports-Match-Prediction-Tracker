@@ -1,8 +1,11 @@
 <resources>
     <string name="app_name">EsportsPredictionTracker</string>
-    <string name="view_matches">View sample matches</string>
-    <string name="sample_matches_title">Sample CS2 matches</string>
-    <string name="no_matches">No matches available</string>
+    <string name="view_matches">View upcoming matches</string>
+    <string name="upcoming_matches_title">Upcoming CS2 matches</string>
+    <string name="no_matches">No upcoming CS2 matches with both teams announced.</string>
+    <string name="loading_matches">Loading upcoming matches...</string>
+    <string name="pandascore_token_missing">PandaScore token missing. Add it to .env and rebuild the debug app.</string>
+    <string name="matches_load_failed">Could not load matches. Check your connection and PandaScore token, then reopen this screen.</string>
     <string name="match_teams">%1$s vs %2$s</string>
     <string name="match_game_competition">%1$s | %2$s</string>
     <string name="match_scheduled">Scheduled: %1$s</string>
@@ -10,8 +13,8 @@
     <string name="home_title">CS2 Match Tracker</string>
     <string name="home_intro">Explore CS2 matchups, competitions and scheduled start times.</string>
     <string name="home_card_label">MATCHES</string>
-    <string name="home_card_title">Sample fixtures</string>
-    <string name="home_card_description">Browse the featured teams and see when each match is scheduled.</string>
+    <string name="home_card_title">Upcoming matches</string>
+    <string name="home_card_description">Browse scheduled CS2 matches and predict a winner.</string>
     <string name="match_list_subtitle">Tap a match to predict the winner</string>
     <string name="navigate_home">Back to home</string>
     <string name="open_prediction_for_match">Predict %1$s versus %2$s</string>

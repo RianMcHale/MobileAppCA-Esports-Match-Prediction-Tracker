@@ -1,6 +1,8 @@
 package org.setu.esportstracker.matches
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -10,8 +12,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
+import org.setu.esportstracker.BuildConfig
 import org.setu.esportstracker.R
-import android.content.Intent
 import org.setu.esportstracker.predictions.PredictionActivity
 
 class MatchListActivity : AppCompatActivity() {
@@ -30,36 +32,78 @@ class MatchListActivity : AppCompatActivity() {
             insets
         }
 
-        // uses toolbar as the app bar and displays an up arrow
+        // uses the toolbar as the app bar and shows an up arrow
         val toolbar = findViewById<MaterialToolbar>(R.id.matchToolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.apply {
-            title = getString(R.string.sample_matches_title)
+            title = getString(R.string.upcoming_matches_title)
             setDisplayHomeAsUpEnabled(true)
             setHomeActionContentDescription(R.string.navigate_home)
         }
 
-        // loads sample matches and finds list and empty-message views
-        val matches: List<EsportsMatch> = InMemoryMatchStore().findAll()
+        // finds the match list and empty-message views
         val matchList = findViewById<RecyclerView>(R.id.matchesRecyclerView)
         val emptyMessage = findViewById<TextView>(R.id.emptyMessage)
-
-        // places match cards in verticle list
         matchList.layoutManager = LinearLayoutManager(this)
+        matchList.visibility = View.GONE
+        emptyMessage.visibility = View.VISIBLE
 
-        // opens prediction screen with tapped match IDs
-        matchList.adapter = MatchAdapter(matches) { selectedMatch ->
-            val intent = Intent(this, PredictionActivity::class.java)
-            intent.putExtra(PredictionActivity.EXTRA_MATCH_ID, selectedMatch.id)
-            startActivity(intent)
+        // tells the user if the token has not been added
+        if (BuildConfig.PANDASCORE_TOKEN.isBlank()) {
+            emptyMessage.text = getString(R.string.pandascore_token_missing)
+            return
         }
 
-        // shows either the list or the empty message
-        matchList.visibility = if (matches.isEmpty()) View.GONE else View.VISIBLE
-        emptyMessage.visibility = if (matches.isEmpty()) View.VISIBLE else View.GONE
+        // shows a message while matches are loading
+        emptyMessage.text = getString(R.string.loading_matches)
+
+        // loads matches without blocking the screen
+        Thread {
+            try {
+                val matches = PandaScoreMatchStore.refreshUpcoming()
+
+                runOnUiThread {
+                    // stops updating the screen if the user has left it
+                    if (isFinishing || isDestroyed) return@runOnUiThread
+
+                    // places the loaded match cards in a vertical list
+                    matchList.adapter = MatchAdapter(matches) { selectedMatch ->
+                        // opens the prediction screen with the selected match
+                        val intent = Intent(this, PredictionActivity::class.java)
+                        intent.putExtra(
+                            PredictionActivity.EXTRA_MATCH_ID,
+                            selectedMatch.id
+                        )
+                        intent.putExtra(
+                            PredictionActivity.EXTRA_MATCH,
+                            selectedMatch
+                        )
+                        startActivity(intent)
+                    }
+
+                    // shows either the matches or the empty message
+                    matchList.visibility =
+                        if (matches.isEmpty()) View.GONE else View.VISIBLE
+                    emptyMessage.visibility =
+                        if (matches.isEmpty()) View.VISIBLE else View.GONE
+                    emptyMessage.text = getString(R.string.no_matches)
+                }
+            } catch (error: Exception) {
+                Log.e("MatchListActivity", "Could not load PandaScore matches", error)
+
+                runOnUiThread {
+                    if (isFinishing || isDestroyed) return@runOnUiThread
+
+                    // shows an error message if the matches could not load
+                    matchList.visibility = View.GONE
+                    emptyMessage.visibility = View.VISIBLE
+                    emptyMessage.text = getString(R.string.matches_load_failed)
+                }
+            }
+        }.start()
     }
 
-    // return to previous screen when toolbars up arrow is pressed
+    // returns to the previous screen when the up arrow is pressed
     override fun onSupportNavigateUp(): Boolean {
         finish()
         return true

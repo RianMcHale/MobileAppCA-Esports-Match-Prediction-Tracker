@@ -1,4 +1,5 @@
 package org.setu.esportstracker.matches
+const val EXTRA_MATCH = "org.setu.esportstracker.extra.MATCH"
 
 class InMemoryMatchStore : MatchStore { // provides fixed samples stored in apps memory (to be replaced by API later in the project)
 
