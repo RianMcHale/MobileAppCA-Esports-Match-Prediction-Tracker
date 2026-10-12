@@ -9,16 +9,18 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.IntentCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.appbar.MaterialToolbar
 import org.setu.esportstracker.R
-import org.setu.esportstracker.matches.InMemoryMatchStore
+import org.setu.esportstracker.matches.EsportsMatch
 
 class PredictionActivity : AppCompatActivity() { // lets user choose the predicted winner for the match
 
     companion object {
-        const val EXTRA_MATCH_ID = "org.setu.esportstracker.extra.MATCH_ID" // use this key to pass and read the match ID
+        const val EXTRA_MATCH_ID = "org.setu.esportstracker.extra.MATCH_ID" // key used to pass the match id
+        const val EXTRA_MATCH = "org.setu.esportstracker.extra.MATCH" // key used to pass the selected match
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,7 +37,7 @@ class PredictionActivity : AppCompatActivity() { // lets user choose the predict
             insets
         }
 
-        // set up the title and up arrow in tool bar
+        // sets up the title and up arrow in the toolbar
         val toolbar = findViewById<MaterialToolbar>(R.id.predictionToolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.apply {
@@ -44,26 +46,29 @@ class PredictionActivity : AppCompatActivity() { // lets user choose the predict
             setHomeActionContentDescription(R.string.back_to_matches)
         }
 
-        // read match id from MatchListActivity
+        // reads the match id and details sent from MatchListActivity
         val matchId = intent.getLongExtra(EXTRA_MATCH_ID, -1L)
-        // find match using the id above
-        val match = InMemoryMatchStore().findOne(matchId)
+        val match = IntentCompat.getSerializableExtra(
+            intent,
+            EXTRA_MATCH,
+            EsportsMatch::class.java
+        )?.takeIf { it.id == matchId } // only uses the match if the ids agree
 
-        // closes form if id does not refer to a match
+        // closes the form if the match was not passed correctly
         if (match == null) {
             Toast.makeText(this, R.string.match_not_found, Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
-        // shows selected match and comp at top of the form
+        // shows the selected match and competition at the top of the form
         findViewById<TextView>(R.id.predictionMatchTitle).text =
             getString(R.string.match_teams, match.teamOneName, match.teamTwoName)
 
         findViewById<TextView>(R.id.predictionCompetition).text =
             getString(R.string.match_game_competition, match.game, match.competition)
 
-        // find controls used to choose and save a team
+        // finds the controls used to choose and save a team
         val teamOneRadio = findViewById<RadioButton>(R.id.teamOneRadio)
         val teamTwoRadio = findViewById<RadioButton>(R.id.teamTwoRadio)
         val teamChoices = findViewById<RadioGroup>(R.id.teamChoiceGroup)
@@ -71,11 +76,11 @@ class PredictionActivity : AppCompatActivity() { // lets user choose the predict
         val status = findViewById<TextView>(R.id.predictionStatus)
         val saveButton = findViewById<Button>(R.id.savePredictionButton)
 
-        // puts the real team names beside the radio buttons
+        // puts the team names beside the radio buttons
         teamOneRadio.text = match.teamOneName
         teamTwoRadio.text = match.teamTwoName
 
-        // display an existing/saved choice and stops a second submission
+        // displays an existing choice and stops a second submission
         fun showSavedPrediction(prediction: Prediction) {
             val choseTeamOne = prediction.predictedTeamId == match.teamOneId
             val teamName = if (choseTeamOne) match.teamOneName else match.teamTwoName
@@ -97,12 +102,12 @@ class PredictionActivity : AppCompatActivity() { // lets user choose the predict
             selectionError.visibility = View.GONE
         }
 
-        // if match has a prediction already, show that
+        // shows the saved choice if this match already has a prediction
         InMemoryPredictionStore.findOne(match.id)?.let {
             showSavedPrediction(it)
         }
 
-        // checks choice and tries to save when button is pressed
+        // checks the choice and tries to save when the button is pressed
         saveButton.setOnClickListener {
             val chosenTeamId = when (teamChoices.checkedRadioButtonId) {
                 R.id.teamOneRadio -> match.teamOneId
@@ -110,20 +115,20 @@ class PredictionActivity : AppCompatActivity() { // lets user choose the predict
                 else -> null
             }
 
-            // team must be selected to save prediction
+            // requires a team to be selected before saving
             if (chosenTeamId == null) {
                 selectionError.visibility = View.VISIBLE
                 return@setOnClickListener
             }
 
-            // creates prediction using thes table IDs and current time
+            // creates a prediction using the team id and current time
             val prediction = Prediction(
                 matchId = match.id,
                 predictedTeamId = chosenTeamId,
                 createdAtUtcMillis = System.currentTimeMillis()
             )
 
-            // shows saved predict ion, if one exists already then it shows that one
+            // shows the saved choice, including one that was already stored
             if (InMemoryPredictionStore.save(prediction)) {
                 showSavedPrediction(prediction)
             } else {
