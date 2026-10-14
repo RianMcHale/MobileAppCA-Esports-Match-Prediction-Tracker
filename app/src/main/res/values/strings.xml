@@ -10,7 +10,7 @@
     <string name="match_game_competition">%1$s | %2$s</string>
     <string name="match_scheduled">Scheduled: %1$s</string>
     <string name="home_eyebrow">COUNTER-STRIKE 2</string>
-    <string name="home_title">CS2 Match Tracker</string>
+    <string name="home_title">Esports Match Tracker</string>
     <string name="home_intro">Explore CS2 matchups, competitions and scheduled start times.</string>
     <string name="home_card_label">MATCHES</string>
     <string name="home_card_title">Upcoming matches</string>
@@ -26,4 +26,19 @@
     <string name="select_team_error">Please select a team.</string>
     <string name="save_prediction">Save prediction</string>
     <string name="prediction_saved_for">Prediction saved: %1$s</string>
+    <string name="view_history">Prediction history</string>
+    <string name="history_title">Prediction history</string>
+    <string name="no_predictions">No predictions saved yet</string>
+    <string name="no_completed_predictions">No completed predictions yet</string>
+    <string name="history_accuracy">%1$d / %2$d correct (%3$.1f%%)</string>
+    <string name="history_pick">Your pick: %1$s</string>
+    <string name="history_result">Winner: %1$s — %2$s</string>
+    <string name="result_pending">Result pending</string>
+    <string name="result_correct">Correct</string>
+    <string name="result_incorrect">Incorrect</string>
+    <string name="record_result">Record result</string>
+    <string name="cancel">Cancel</string>
+    <string name="checking_results">Checking official results…</string>
+    <string name="results_checked">Official results checked</string>
+    <string name="results_check_failed">Could not check results. Try opening history again.</string>
 </resources>
