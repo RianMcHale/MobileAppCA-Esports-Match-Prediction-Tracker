@@ -12,64 +12,105 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.tabs.TabLayout
 import org.setu.esportstracker.BuildConfig
 import org.setu.esportstracker.R
 import org.setu.esportstracker.predictions.PredictionActivity
 
 class MatchListActivity : AppCompatActivity() {
 
-    // sets up the screen when android creates it
+    // Identifies the newest request when users switch tabs quickly.
+    private var latestRequestId = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_match_list)
 
-        // keeps the screen content clear of system bars
         val root = findViewById<View>(R.id.matchListRoot)
         ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
-            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val bars = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars()
+            )
             view.setPadding(bars.left, bars.top, bars.right, bars.bottom)
             insets
         }
 
-        // uses the toolbar as the app bar and shows an up arrow
         val toolbar = findViewById<MaterialToolbar>(R.id.matchToolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.apply {
-            title = getString(R.string.upcoming_matches_title)
+            title = getString(R.string.matches_title)
             setDisplayHomeAsUpEnabled(true)
             setHomeActionContentDescription(R.string.navigate_home)
         }
 
-        // finds the match list and empty-message views
+        findViewById<RecyclerView>(R.id.matchesRecyclerView)
+            .layoutManager = LinearLayoutManager(this)
+
+        val tabs = findViewById<TabLayout>(R.id.matchTabs)
+        tabs.addOnTabSelectedListener(
+            object : TabLayout.OnTabSelectedListener {
+                override fun onTabSelected(tab: TabLayout.Tab) {
+                    loadMatches(categoryFor(tab.position))
+                }
+
+                override fun onTabUnselected(tab: TabLayout.Tab) {
+                    // Nothing is needed when leaving a tab.
+                }
+
+                override fun onTabReselected(tab: TabLayout.Tab) {
+                    // Tapping the current tab checks for fresh matches.
+                    loadMatches(categoryFor(tab.position))
+                }
+            }
+        )
+
+        // The first tab is Upcoming.
+        loadMatches(MatchCategory.UPCOMING)
+    }
+
+    private fun categoryFor(position: Int): MatchCategory =
+        when (position) {
+            1 -> MatchCategory.LIVE
+            2 -> MatchCategory.COMPLETED
+            else -> MatchCategory.UPCOMING
+        }
+
+    private fun loadMatches(category: MatchCategory) {
+        val requestId = ++latestRequestId
         val matchList = findViewById<RecyclerView>(R.id.matchesRecyclerView)
         val emptyMessage = findViewById<TextView>(R.id.emptyMessage)
-        matchList.layoutManager = LinearLayoutManager(this)
+
+        matchList.adapter = null
         matchList.visibility = View.GONE
         emptyMessage.visibility = View.VISIBLE
 
-        // tells the user if the token has not been added
         if (BuildConfig.PANDASCORE_TOKEN.isBlank()) {
-            emptyMessage.text = getString(R.string.pandascore_token_missing)
+            emptyMessage.setText(R.string.pandascore_token_missing)
             return
         }
 
-        // shows a message while matches are loading
-        emptyMessage.text = getString(R.string.loading_matches)
+        emptyMessage.setText(R.string.loading_matches)
 
-        // loads matches without blocking the screen
         Thread {
             try {
-                val matches = PandaScoreMatchStore.refreshUpcoming()
+                val matches = PandaScoreMatchStore.refresh(category)
 
                 runOnUiThread {
-                    // stops updating the screen if the user has left it
-                    if (isFinishing || isDestroyed) return@runOnUiThread
+                    if (isFinishing || isDestroyed ||
+                        requestId != latestRequestId
+                    ) {
+                        return@runOnUiThread
+                    }
 
-                    // places the loaded match cards in a vertical list
-                    matchList.adapter = MatchAdapter(matches) { selectedMatch ->
-                        // opens the prediction screen with the selected match
-                        val intent = Intent(this, PredictionActivity::class.java)
+                    matchList.adapter = MatchAdapter(
+                        matches,
+                        category
+                    ) { selectedMatch ->
+                        val intent = Intent(
+                            this,
+                            PredictionActivity::class.java
+                        )
                         intent.putExtra(
                             PredictionActivity.EXTRA_MATCH_ID,
                             selectedMatch.id
@@ -81,29 +122,43 @@ class MatchListActivity : AppCompatActivity() {
                         startActivity(intent)
                     }
 
-                    // shows either the matches or the empty message
                     matchList.visibility =
                         if (matches.isEmpty()) View.GONE else View.VISIBLE
                     emptyMessage.visibility =
                         if (matches.isEmpty()) View.VISIBLE else View.GONE
-                    emptyMessage.text = getString(R.string.no_matches)
+
+                    val emptyText = when (category) {
+                        MatchCategory.UPCOMING ->
+                            R.string.no_upcoming_matches
+                        MatchCategory.LIVE ->
+                            R.string.no_live_matches
+                        MatchCategory.COMPLETED ->
+                            R.string.no_completed_matches
+                    }
+                    emptyMessage.setText(emptyText)
                 }
             } catch (error: Exception) {
-                Log.e("MatchListActivity", "Could not load PandaScore matches", error)
+                Log.e(
+                    "MatchListActivity",
+                    "Could not load PandaScore matches",
+                    error
+                )
 
                 runOnUiThread {
-                    if (isFinishing || isDestroyed) return@runOnUiThread
+                    if (isFinishing || isDestroyed ||
+                        requestId != latestRequestId
+                    ) {
+                        return@runOnUiThread
+                    }
 
-                    // shows an error message if the matches could not load
                     matchList.visibility = View.GONE
                     emptyMessage.visibility = View.VISIBLE
-                    emptyMessage.text = getString(R.string.matches_load_failed)
+                    emptyMessage.setText(R.string.matches_load_failed)
                 }
             }
         }.start()
     }
 
-    // returns to the previous screen when the up arrow is pressed
     override fun onSupportNavigateUp(): Boolean {
         finish()
         return true

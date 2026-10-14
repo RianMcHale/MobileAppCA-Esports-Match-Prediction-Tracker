@@ -10,11 +10,9 @@ import java.text.ParsePosition
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-object PandaScoreMatchStore : MatchStore { // gets upcoming CS2 matches from PandaScore
-    private const val PAGE_SIZE = 100
-    private const val URL_BASE = "https://api.pandascore.co/csgo/matches/upcoming"
+object PandaScoreMatchStore : MatchStore {
+    private const val URL_BASE = "https://api.pandascore.co/csgo/matches"
 
-    // stores the last matches loaded so they can be found by id
     @Volatile
     private var cachedMatches: List<EsportsMatch> = emptyList()
 
@@ -23,37 +21,60 @@ object PandaScoreMatchStore : MatchStore { // gets upcoming CS2 matches from Pan
     override fun findOne(id: Long): EsportsMatch? =
         cachedMatches.find { it.id == id }
 
-    // asks PandaScore for each page of upcoming matches
-    fun refreshUpcoming(): List<EsportsMatch> {
+    // Network work: call from a background thread.
+    fun refresh(category: MatchCategory): List<EsportsMatch> {
         check(BuildConfig.PANDASCORE_TOKEN.isNotBlank()) {
             "PandaScore token is missing"
         }
 
+        val pageSize = if (category == MatchCategory.COMPLETED) 50 else 100
         val results = mutableListOf<EsportsMatch>()
         var page = 1
 
         while (true) {
-            val response = requestPage(page)
+            val response = requestPage(category, page, pageSize)
 
-            // adds matches that have enough information for the app
             for (index in 0 until response.length()) {
                 val item = response.optJSONObject(index) ?: continue
-                mapMatch(item)?.let(results::add)
+                mapMatch(item, category)?.let(results::add)
             }
 
-            // stops when there are no more full pages
-            if (response.length() < PAGE_SIZE) break
+            // Show only the newest page of completed matches.
+            // Otherwise, continue until all pages have been loaded.
+            if (category == MatchCategory.COMPLETED ||
+                response.length() < pageSize
+            ) {
+                break
+            }
+
             page++
         }
 
-        // sorts matches by start time and saves the list
-        return results.sortedBy { it.startTimeUtcMillis }.also {
-            cachedMatches = it
+        val sorted = if (category == MatchCategory.COMPLETED) {
+            results.sortedByDescending { it.startTimeUtcMillis }
+        } else {
+            results.sortedBy { it.startTimeUtcMillis }
         }
+
+        cachedMatches = sorted
+        return sorted
     }
 
-    private fun requestPage(page: Int): JSONArray {
-        val url = URL("$URL_BASE?per_page=$PAGE_SIZE&page=$page")
+    private fun requestPage(
+        category: MatchCategory,
+        page: Int,
+        pageSize: Int
+    ): JSONArray {
+        val sort = if (category == MatchCategory.COMPLETED) {
+            "&sort=-begin_at"
+        } else {
+            ""
+        }
+
+        val url = URL(
+            "$URL_BASE/${category.apiPath}" +
+                    "?per_page=$pageSize&page=$page$sort"
+        )
         val connection = url.openConnection() as HttpURLConnection
 
         try {
@@ -61,8 +82,6 @@ object PandaScoreMatchStore : MatchStore { // gets upcoming CS2 matches from Pan
             connection.connectTimeout = 10_000
             connection.readTimeout = 10_000
             connection.setRequestProperty("Accept", "application/json")
-
-            // sends the token with the request
             connection.setRequestProperty(
                 "Authorization",
                 "Bearer ${BuildConfig.PANDASCORE_TOKEN}"
@@ -79,16 +98,24 @@ object PandaScoreMatchStore : MatchStore { // gets upcoming CS2 matches from Pan
             }
             return JSONArray(body)
         } finally {
-            // closes the connection even if the request fails
             connection.disconnect()
         }
     }
 
-    private fun mapMatch(item: JSONObject): EsportsMatch? {
+    private fun mapMatch(
+        item: JSONObject,
+        category: MatchCategory
+    ): EsportsMatch? {
+        // Do not show canceled matches in the Completed tab.
+        if (category == MatchCategory.COMPLETED &&
+            item.optString("status") != "finished"
+        ) {
+            return null
+        }
+
         val matchId = item.optLong("id", -1L)
         val opponents = item.optJSONArray("opponents") ?: return null
 
-        // skips matches without two known teams
         if (matchId <= 0L || opponents.length() != 2) return null
 
         val firstTeam = opponents.optJSONObject(0)
@@ -103,9 +130,10 @@ object PandaScoreMatchStore : MatchStore { // gets upcoming CS2 matches from Pan
 
         if (firstId <= 0L || secondId <= 0L ||
             firstName.isBlank() || secondName.isBlank()
-        ) return null
+        ) {
+            return null
+        }
 
-        // uses the scheduled time, or the begin time if needed
         val scheduledAt = item.optString("scheduled_at")
             .takeUnless { it.isBlank() || it == "null" }
             ?: item.optString("begin_at")
@@ -116,6 +144,13 @@ object PandaScoreMatchStore : MatchStore { // gets upcoming CS2 matches from Pan
             .orEmpty()
             .ifBlank { "Unknown tournament" }
 
+        val apiWinnerId = item.optLong("winner_id", -1L)
+        val winnerId = apiWinnerId.takeIf {
+            category == MatchCategory.COMPLETED &&
+                    item.optString("winner_type") == "Team" &&
+                    (it == firstId || it == secondId)
+        }
+
         return EsportsMatch(
             id = matchId,
             teamOneId = firstId,
@@ -124,12 +159,12 @@ object PandaScoreMatchStore : MatchStore { // gets upcoming CS2 matches from Pan
             teamTwoName = secondName,
             game = "CS2",
             competition = competition,
-            startTimeUtcMillis = startMillis
+            startTimeUtcMillis = startMillis,
+            winnerTeamId = winnerId
         )
     }
 
     private fun parseTime(value: String): Long? {
-        // removes decimal seconds before reading the date
         val normalized = value.replace(
             Regex("\\.\\d+(?=Z|[+-]\\d{2}:\\d{2}$)"),
             ""
@@ -144,8 +179,6 @@ object PandaScoreMatchStore : MatchStore { // gets upcoming CS2 matches from Pan
 
         val position = ParsePosition(0)
         val date = formatter.parse(normalized, position)
-
-        // only accepts the date if the whole value was read
         return date?.takeIf { position.index == normalized.length }?.time
     }
 }

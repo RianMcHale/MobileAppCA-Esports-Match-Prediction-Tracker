@@ -14,6 +14,31 @@
         android:background="?attr/colorSurface"
         app:titleTextColor="?attr/colorOnSurface" />
 
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/matchTabs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorSurface"
+        app:tabGravity="fill"
+        app:tabMode="fixed">
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/filter_upcoming" />
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/filter_live" />
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/filter_completed" />
+
+    </com.google.android.material.tabs.TabLayout>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
