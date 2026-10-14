@@ -9,6 +9,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import org.setu.esportstracker.R
 import org.setu.esportstracker.matches.MatchListActivity
+import org.setu.esportstracker.predictions.PredictionHistoryActivity
 
 class MainActivity : AppCompatActivity() { // first screen when the app opens up
 
@@ -29,6 +30,10 @@ class MainActivity : AppCompatActivity() { // first screen when the app opens up
         // opens the match list when user presses the button
         findViewById<Button>(R.id.viewMatchesButton).setOnClickListener {
             startActivity(Intent(this, MatchListActivity::class.java))
+        }
+
+        findViewById<Button>(R.id.viewHistoryButton).setOnClickListener {
+            startActivity(Intent(this, PredictionHistoryActivity::class.java))
         }
     }
 }
