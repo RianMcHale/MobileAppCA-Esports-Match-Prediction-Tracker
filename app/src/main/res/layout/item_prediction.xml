@@ -39,12 +39,5 @@
             android:layout_marginTop="6dp"
             android:textColor="?attr/colorOnSurfaceVariant" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/recordResultButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/record_result" />
-
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

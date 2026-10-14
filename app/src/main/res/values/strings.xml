@@ -36,8 +36,6 @@
     <string name="result_pending">Result pending</string>
     <string name="result_correct">Correct</string>
     <string name="result_incorrect">Incorrect</string>
-    <string name="record_result">Record result</string>
-    <string name="cancel">Cancel</string>
     <string name="checking_results">Checking official results…</string>
     <string name="results_checked">Official results checked</string>
     <string name="results_check_failed">Could not check results. Try opening history again.</string>
