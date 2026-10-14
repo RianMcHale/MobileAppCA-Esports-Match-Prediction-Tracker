@@ -125,7 +125,8 @@ class PredictionActivity : AppCompatActivity() { // lets user choose the predict
             val prediction = Prediction(
                 matchId = match.id,
                 predictedTeamId = chosenTeamId,
-                createdAtUtcMillis = System.currentTimeMillis()
+                createdAtUtcMillis = System.currentTimeMillis(),
+                match = match
             )
 
             // shows the saved choice, including one that was already stored
