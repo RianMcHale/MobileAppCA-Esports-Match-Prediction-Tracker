@@ -78,6 +78,7 @@ AI tools were used in the following parts of this project:
 
 - **Code comments:** Codex was used to write simplified comments across the entire project, so the code is clearer for anyone reading it.
 - **GitHub issues:** Codex was used to help write issue names and descriptions.
+- **GitHub Releases:** Codex was used to help write release descriptions.
 - **Planning:** Codex was used to help plan the project out step by step.
 - **README.md:** Claude was used to analyze the project repository and create this README.
 
