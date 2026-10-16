@@ -1,23 +1,41 @@
 <resources>
+    <!-- app name and home screen text. -->
     <string name="app_name">EsportsPredictionTracker</string>
     <string name="view_matches">Browse CS2 matches</string>
-    <string name="upcoming_matches_title">Upcoming CS2 matches</string>
-    <string name="no_matches">No upcoming CS2 matches with both teams announced.</string>
-    <string name="loading_matches">Loading matches…</string>
-    <string name="pandascore_token_missing">PandaScore token missing. Add it to .env and rebuild the debug app.</string>
-    <string name="matches_load_failed">Could not load matches. Check your connection and PandaScore token, then try the tab again.</string>
-    <string name="match_teams">%1$s vs %2$s</string>
-    <string name="match_game_competition">%1$s | %2$s</string>
-    <string name="match_scheduled">Scheduled: %1$s</string>
     <string name="home_eyebrow">COUNTER-STRIKE 2</string>
     <string name="home_title">Esports Match Tracker</string>
     <string name="home_intro">Explore CS2 matchups, competitions and scheduled start times.</string>
     <string name="home_card_label">MATCHES</string>
     <string name="home_card_title">Upcoming matches</string>
     <string name="home_card_description">Browse scheduled CS2 matches and predict a winner.</string>
+    <string name="view_history">Prediction history</string>
+
+    <!-- match list headings, filters, and messages. -->
+    <string name="upcoming_matches_title">Upcoming CS2 matches</string>
+    <string name="matches_title">CS2 matches</string>
+    <string name="filter_upcoming">Upcoming</string>
+    <string name="filter_live">Live</string>
+    <string name="filter_completed">Completed</string>
     <string name="match_list_subtitle">Select a category. Tap an upcoming match to predict its winner.</string>
-    <string name="navigate_home">Back to home</string>
+    <string name="no_matches">No upcoming CS2 matches with both teams announced.</string>
+    <string name="no_upcoming_matches">No upcoming CS2 matches with both teams announced.</string>
+    <string name="no_live_matches">No CS2 matches are live right now.</string>
+    <string name="no_completed_matches">No recent completed CS2 matches with both teams announced.</string>
+    <string name="loading_matches">Loading matches…</string>
+    <string name="pandascore_token_missing">PandaScore token missing. Add it to .env and rebuild the debug app.</string>
+    <string name="matches_load_failed">Could not load matches. Check your connection and PandaScore token, then try the tab again.</string>
+
+    <!-- text used inside a match card. -->
+    <string name="match_teams">%1$s vs %2$s</string>
+    <string name="match_game_competition">%1$s | %2$s</string>
+    <string name="match_scheduled">Scheduled: %1$s</string>
+    <string name="match_live">Live now</string>
+    <string name="completed_winner">Winner: %1$s</string>
+    <string name="result_unavailable">Result unavailable</string>
     <string name="open_prediction_for_match">Predict %1$s versus %2$s</string>
+    <string name="navigate_home">Back to home</string>
+
+    <!-- prediction form text. -->
     <string name="prediction_title">Make a prediction</string>
     <string name="back_to_matches">Back to matches</string>
     <string name="match_not_found">Match not found</string>
@@ -26,7 +44,8 @@
     <string name="select_team_error">Please select a team.</string>
     <string name="save_prediction">Save prediction</string>
     <string name="prediction_saved_for">Prediction saved: %1$s</string>
-    <string name="view_history">Prediction history</string>
+
+    <!-- history, accuracy, and official result text. -->
     <string name="history_title">Prediction history</string>
     <string name="no_predictions">No predictions saved yet</string>
     <string name="no_completed_predictions">No completed predictions yet</string>
@@ -39,14 +58,4 @@
     <string name="checking_results">Checking official results…</string>
     <string name="results_checked">Official results checked</string>
     <string name="results_check_failed">Could not check results. Try opening history again.</string>
-    <string name="matches_title">CS2 matches</string>
-    <string name="filter_upcoming">Upcoming</string>
-    <string name="filter_live">Live</string>
-    <string name="filter_completed">Completed</string>
-    <string name="no_upcoming_matches">No upcoming CS2 matches with both teams announced.</string>
-    <string name="no_live_matches">No CS2 matches are live right now.</string>
-    <string name="no_completed_matches">No recent completed CS2 matches with both teams announced.</string>
-    <string name="match_live">Live now</string>
-    <string name="completed_winner">Winner: %1$s</string>
-    <string name="result_unavailable">Result unavailable</string>
 </resources>

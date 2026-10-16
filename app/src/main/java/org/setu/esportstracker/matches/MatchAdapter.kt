@@ -9,12 +9,14 @@ import org.setu.esportstracker.R
 import java.text.DateFormat
 import java.util.Date
 
+// puts match details into the cards shown in the list.
 class MatchAdapter(
-    private val matches: List<EsportsMatch>,
-    private val category: MatchCategory,
-    private val onMatchClick: (EsportsMatch) -> Unit
+    private val matches: List<EsportsMatch>, // matches to display.
+    private val category: MatchCategory, // the selected tab.
+    private val onMatchClick: (EsportsMatch) -> Unit // action for an upcoming match.
 ) : RecyclerView.Adapter<MatchAdapter.MatchViewHolder>() {
 
+    // keeps references to the text views inside one match card.
     class MatchViewHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
         val teamsText: TextView = itemView.findViewById(R.id.teamsText)
@@ -26,6 +28,7 @@ class MatchAdapter(
             itemView.findViewById(R.id.matchStatusText)
     }
 
+    // creates a card when the list needs another one on screen.
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -35,22 +38,26 @@ class MatchAdapter(
         return MatchViewHolder(view)
     }
 
+    // fills one card with the match at this list position.
     override fun onBindViewHolder(holder: MatchViewHolder, position: Int) {
         val match = matches[position]
         val context = holder.itemView.context
 
+        // shows both team names.
         holder.teamsText.text = context.getString(
             R.string.match_teams,
             match.teamOneName,
             match.teamTwoName
         )
 
+        // shows the game and competition.
         holder.competitionText.text = context.getString(
             R.string.match_game_competition,
             match.game,
             match.competition
         )
 
+        // turns the stored utc time into the device's local date and time.
         val localTime = DateFormat.getDateTimeInstance(
             DateFormat.MEDIUM,
             DateFormat.SHORT
@@ -61,21 +68,25 @@ class MatchAdapter(
             localTime
         )
 
+        // upcoming cards do not need an extra status line.
         holder.statusText.visibility =
             if (category == MatchCategory.UPCOMING) View.GONE else View.VISIBLE
 
+        // live cards show their status; completed cards try to show the winner.
         holder.statusText.text = when (category) {
             MatchCategory.UPCOMING -> ""
             MatchCategory.LIVE ->
                 context.getString(R.string.match_live)
 
             MatchCategory.COMPLETED -> {
+                // the winner id must match one of the teams on this card.
                 val winnerName = when (match.winnerTeamId) {
                     match.teamOneId -> match.teamOneName
                     match.teamTwoId -> match.teamTwoName
                     else -> null
                 }
 
+                // some finished matches may not have a usable winner yet.
                 if (winnerName == null) {
                     context.getString(R.string.result_unavailable)
                 } else {
@@ -84,25 +95,32 @@ class MatchAdapter(
             }
         }
 
+        // predictions are only allowed from the upcoming tab.
         val canPredict = category == MatchCategory.UPCOMING
 
         if (canPredict) {
+            // describes the button-like card for accessibility.
             holder.itemView.contentDescription = context.getString(
                 R.string.open_prediction_for_match,
                 match.teamOneName,
                 match.teamTwoName
             )
+
+            // sends the selected match back to the activity.
             holder.itemView.setOnClickListener {
                 onMatchClick(match)
             }
         } else {
+            // removes the click action from live and completed cards.
             holder.itemView.contentDescription = null
             holder.itemView.setOnClickListener(null)
         }
 
+        // also removes tap and keyboard focus from cards that cannot be predicted.
         holder.itemView.isClickable = canPredict
         holder.itemView.isFocusable = canPredict
     }
 
+    // tells the list how many match cards it has.
     override fun getItemCount(): Int = matches.size
 }

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- the history screen holds the summary and prediction cards. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/historyRoot"
@@ -7,6 +8,7 @@
     android:background="?attr/colorSurfaceVariant"
     android:orientation="vertical">
 
+    <!-- title and back arrow for history. -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/historyToolbar"
         android:layout_width="match_parent"
@@ -14,6 +16,7 @@
         android:background="?attr/colorSurface"
         app:titleTextColor="?attr/colorOnSurface" />
 
+    <!-- lets a longer history scroll. -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -25,6 +28,7 @@
             android:orientation="vertical"
             android:padding="20dp">
 
+            <!-- shows correct picks and accuracy, or the no-results message. -->
             <TextView
                 android:id="@+id/historySummary"
                 android:layout_width="match_parent"
@@ -33,6 +37,7 @@
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
+            <!-- shows whether pandascore results were checked. -->
             <TextView
                 android:id="@+id/historySyncStatus"
                 android:layout_width="match_parent"
@@ -41,6 +46,7 @@
                 android:textColor="?attr/colorOnSurfaceVariant"
                 android:visibility="gone" />
 
+            <!-- appears when there are no saved predictions. -->
             <TextView
                 android:id="@+id/historyEmptyMessage"
                 android:layout_width="match_parent"
@@ -50,6 +56,7 @@
                 android:textColor="?attr/colorOnSurfaceVariant"
                 android:visibility="gone" />
 
+            <!-- prediction cards are added to this list in kotlin. -->
             <LinearLayout
                 android:id="@+id/historyList"
                 android:layout_width="match_parent"

@@ -1,4 +1,4 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+// makes the android plugin available to modules without applying it here.
 plugins {
     alias(libs.plugins.android.application) apply false
 }
